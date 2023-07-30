@@ -1,0 +1,57 @@
+diff --git a/src/dec/vp8l_dec.c b/src/dec/vp8l_dec.c
+index 2d603b43..a6485d30 100644
+--- a/src/dec/vp8l_dec.c
++++ b/src/dec/vp8l_dec.c
+@@ -657,6 +657,8 @@ static void ConvertToYUVA(const uint32_t* const src, int width, int y_pos,
+   }
+ }
+ 
++#if !defined(WEBP_REDUCE_SIZE)
++
+ static int ExportYUVA(const VP8LDecoder* const dec, int y_pos) {
+   WebPRescaler* const rescaler = dec->rescaler;
+   uint32_t* const src = (uint32_t*)rescaler->dst;
+@@ -691,6 +693,8 @@ static int EmitRescaledRowsYUVA(const VP8LDecoder* const dec,
+   return y_pos;
+ }
+ 
++#endif   // WEBP_REDUCE_SIZE
++
+ static int EmitRowsYUVA(const VP8LDecoder* const dec,
+                         const uint8_t* in, int in_stride,
+                         int mb_w, int num_rows) {
+@@ -808,8 +812,11 @@ static void ProcessRows(VP8LDecoder* const dec, int row) {
+         // Update 'last_out_row_'.
+         dec->last_out_row_ += num_rows_out;
+       } else {                              // convert to YUVA
+-        dec->last_out_row_ = io->use_scaling ?
++        dec->last_out_row_ =
++#if !defined(WEBP_REDUCE_SIZE)
++         io->use_scaling ?
+             EmitRescaledRowsYUVA(dec, rows_data, in_stride, io->mb_h) :
++#endif  // WEBP_REDUCE_SIZE
+             EmitRowsYUVA(dec, rows_data, in_stride, io->mb_w, io->mb_h);
+       }
+       assert(dec->last_out_row_ <= output->height);
+diff --git a/src/dec/webp_dec.c b/src/dec/webp_dec.c
+index 42d09887..05736783 100644
+--- a/src/dec/webp_dec.c
++++ b/src/dec/webp_dec.c
+@@ -816,6 +816,7 @@ int WebPIoInitFromOptions(const WebPDecoderOptions* const options,
+   // Scaling
+   io->use_scaling = (options != NULL) && (options->use_scaling > 0);
+   if (io->use_scaling) {
++#if !defined(WEBP_REDUCE_SIZE)
+     int scaled_width = options->scaled_width;
+     int scaled_height = options->scaled_height;
+     if (!WebPRescalerGetScaledDimensions(w, h, &scaled_width, &scaled_height)) {
+@@ -823,6 +824,9 @@ int WebPIoInitFromOptions(const WebPDecoderOptions* const options,
+     }
+     io->scaled_width = scaled_width;
+     io->scaled_height = scaled_height;
++#else
++    return VP8_STATUS_INVALID_PARAM;   // rescaling not supported
++#endif
+   }
+ 
+   // Filter

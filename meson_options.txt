@@ -1,0 +1,5 @@
+# Image formats.
+option('gif' , type: 'boolean')
+option('webp', type: 'boolean')
+# Output options.
+option('wasm', type: 'boolean')

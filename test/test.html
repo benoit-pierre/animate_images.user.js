@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <style>
+#commands {
+
+}
+#commands > button {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin: 0.1em;
+}
+#controls:hover {
+  opacity: 1;
+}
+#controls {
+  background: white;
+  border: solid black 0.1em;
+  opacity: 0;
+  position: fixed;
+  z-index: 666;
+}
+#controls > * {
+  margin: 0.2em;
+}
+#samples {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+#samples > div {
+  border: solid black 0.1em;
+  margin: 0.2em;
+}
+#samples > div > * {
+  border: none;
+  margin: 0.05em;
+}
+#samples > div > p {
+  font: monospace;
+  text-align: center;
+  max-height: 2em;
+}
+  </style>
+  <body>
+    <div id='controls'>
+      <button id="enable_test_code">Enable test code</button>
+      <div id='commands'></div>
+    </div>
+    <div id='samples'>
+      <div>
+	<p>animated_1.gif</p>
+	<img src="animated_1.gif">
+      </div>
+      <div>
+	<p>animated_2.gif</p>
+	<img src="animated_2.gif">
+      </div>
+      <div>
+	<p>animated_gif</p>
+	<img src="animated_gif">
+      </div>
+      <div>
+	<p>jpeg.gif</p>
+	<img src="jpeg.gif">
+      </div>
+      <div>
+	<p>static.gif</p>
+	<img src="static.gif">
+      </div>
+      <div>
+	<p>jpeg.jpg</p>
+	<img src="jpeg.jpg">
+      </div>
+      <div>
+	<p>animated_1.webp</p>
+	<img src="animated_1.webp">
+      </div>
+      <div>
+	<p>animated_2.webp</p>
+	<img src="animated_2.webp">
+      </div>
+      <div>
+	<p>animated_webp</p>
+	<img src="animated_webp">
+      </div>
+      <div>
+	<p>jpeg.webp</p>
+	<img src="jpeg.webp">
+      </div>
+      <div>
+	<p>static.webp</p>
+	<img src="static.webp">
+      </div>
+      <div>
+	<p>jpeg.webp</p>
+	<img src="jpeg.webp">
+      </div>
+      <div>
+	<p>animated_1.avif</p>
+	<img src="animated_1.avif">
+      </div>
+    </div>
+    <p>
+    Other test pages:
+    <ul>
+      <li>
+	<a href="https://colinbendell.github.io/webperf/animated-gif-decode/webp.html">
+	  Colin Bendell's animated WebPs
+	</a>
+      </li>
+      <li>
+	<a href="https://giphy.com/trending-gifs">
+	  Giphy
+	</a>
+      </li>
+    </ul>
+    </p>
+    <script type="module" src="test.mjs"></script>
+  </body>
+</html>
+<!--
+vim: sw=2
+-->

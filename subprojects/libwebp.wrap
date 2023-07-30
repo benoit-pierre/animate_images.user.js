@@ -1,0 +1,11 @@
+[wrap-git]
+url = https://github.com/webmproject/libwebp.git
+# v1.3.1
+revision = fd7bb21c0cb56e8a82e9bfa376164b842f433f3b
+depth = 1
+patch_directory = libwebp/overlay
+diff_files = 
+	libwebp/fix-WEBP_REDUCE_SIZE-support.patch
+
+[provide]
+dependency_names = libwebp, libwebpdemux
