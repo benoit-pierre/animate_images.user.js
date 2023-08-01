@@ -70,17 +70,26 @@ endif
 
 .PHONY: container-build docker-build docker-clean podman-build podman-clean
 
+define container_run
+$(strip $(call find_program,$1,$2) run --mount type=bind,source='$(CURDIR),target=/src' \
+	--interactive --rm --tty $3 '$4emscripten/emsdk$(EMSDK_VERSION:%=:%)' \
+	env MAKEFLAGS='$(filter-out --jobserver-%,$(MAKEFLAGS))' \
+	make BUILD_DIR='$($1_BUILD)' USER_MK='$($1_USER_MK)' \
+	-C /src container-build \
+	)
+endef
+
 container-build:
 	npm config set prefix='~/.local/' update-notifier=false
-	npm install --global --no-audit esbuild
-	python3 -m pip install --no-warn-script-location --user meson ninja
+	npm install --global --no-audit 'esbuild$(ESBUILD_VERSION:%=@%)'
+	python3 -m pip install --no-warn-script-location --user 'meson$(MESON_VERSION:%===%)' 'ninja$(NINJA_VERSION:%===%)'
 	env PATH="$$HOME/.local/bin:$$PATH" $(MAKE) all
 
 DOCKER_BUILD   ?= build-docker
 DOCKER_USER_MK ?= user-docker.mk
 
 docker-build:
-	$(call find_program,DOCKER,docker) run --rm --mount type=bind,source='$(CURDIR),target=/src' --user "$$UID:$$GID" --tty --interactive emscripten/emsdk make BUILD_DIR='$(DOCKER_BUILD)' USER_MK='$(DOCKER_USER_MK)' -C /src container-build
+	$(call container_run,DOCKER,docker,--user "$$UID:$$GID",)
 
 docker-clean:
 	rm --force --recursive '$(DOCKER_BUILD)' '$(DOCKER_USER_MK)'
@@ -89,7 +98,7 @@ PODMAN_BUILD   ?= build-podman
 PODMAN_USER_MK ?= user-podman.mk
 
 podman-build:
-	$(call find_program,PODMAN,podman) run --rm --mount type=bind,source='$(CURDIR),target=/src' --tty --interactive docker.io/emscripten/emsdk make BUILD_DIR='$(PODMAN_BUILD)' USER_MK='$(PODMAN_USER_MK)' -C /src container-build
+	$(call container_run,PODMAN,podman,,docker.io/)
 
 podman-clean:
 	rm --force --recursive '$(PODMAN_BUILD)' '$(PODMAN_USER_MK)'
