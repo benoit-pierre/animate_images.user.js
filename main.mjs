@@ -192,7 +192,7 @@ export async function main(GM, unsafeWindow) {
     // Get the current bounding rect, including the border-box.
     const rect = element.getBoundingClientRect();
     const viewport = {};
-    // We need to get the current scale since the computed values don't know about it...
+    // We need to get the current scale since the computed values don't know about it…
     viewport.xscale = 1 / (element.offsetWidth / rect.width);
     viewport.yscale = 1 / (element.offsetHeight / rect.height);
     viewport.padding_left = padding_left * viewport.xscale;
@@ -429,7 +429,7 @@ export async function main(GM, unsafeWindow) {
         }
         this.next_timestamp += duration;
         if (this.next_timestamp <= timestamp) {
-          // We're too slow...
+          // We're too slow…
           this.next_timestamp = timestamp;
         }
       }
@@ -461,7 +461,7 @@ export async function main(GM, unsafeWindow) {
         return;
       }
       log('player.stop', this.id);
-      // N.B.: need to use `unsafeWindow` to support ViolentMonkey...
+      // N.B.: need to use `unsafeWindow` to support ViolentMonkey…
       if (this.timeout) {
         clearTimeout(this.timeout);
         this.timeout = 0;
