@@ -68,20 +68,34 @@ ldflags += {
 add_global_arguments(cflags, language: 'c')
 add_global_link_arguments(cflags + ldflags, language: 'c')
 
+formats_support = {}
+
 helpers_deps = []
 helpers_srcs = []
 
-if get_option('gif')
-  subproject('libnsgif')
-  helpers_deps += dependency('libnsgif')
-  helpers_srcs += 'helpers_gif.c'
-endif
+foreach _spec : [
+  ['gif', 'libnsgif', 'libnsgif'],
+  ['webp', 'libwebp', 'libwebpdemux'],
+]
+  _fmt = _spec[0]
+  _prj = _spec[1]
+  _dep = _spec[2]
+  _supported = get_option(_fmt)
+  if _supported
+    subproject(_prj)
+    helpers_deps += dependency(_dep)
+    helpers_srcs += 'helpers_@0@.c'.format(_fmt)
+  endif
+  formats_support += {'@0@_SUPPORT'.format(_fmt.to_upper()): _supported.to_string()}
+endforeach
 
-if get_option('webp')
-  subproject('libwebp')
-  helpers_deps += dependency('libwebpdemux')
-  helpers_srcs += 'helpers_webp.c'
-endif
+entrypoint = fs.copyfile('entrypoint.mjs')
+
+formats = configure_file(
+  configuration: formats_support,
+  input: 'formats.mjs',
+  output: 'formats.mjs',
+)
 
 helpers = executable(
   'helpers',
@@ -89,6 +103,8 @@ helpers = executable(
   dependencies: helpers_deps,
   name_suffix: 'mjs',
 )
+
+main = fs.copyfile('main.mjs')
 
 script = custom_target(
   'script',
@@ -102,17 +118,19 @@ script = custom_target(
     '@INPUT0@',
   ],
   input: [
-    fs.copyfile('script.mjs'),
-    fs.copyfile('main.mjs'),
+    entrypoint,
+    formats,
     helpers,
+    main,
   ],
   output: 'animate_images.user.js',
 )
 
 lint_files = []
 foreach _f : [
+  'entrypoint.mjs',
+  'formats.mjs',
   'main.mjs',
-  'script.mjs',
   'test/test.mjs',
 ]
   lint_files += meson.project_source_root() / _f
@@ -123,5 +141,17 @@ run_target(
   command: [
     find_program('eslint', disabler: true, required: false),
     lint_files,
+  ],
+)
+
+run_target(
+  'serve',
+  command: [
+    find_program('miniserve', disabler: true, required: false),
+    '--index=test.html', meson.project_source_root() / 'test',
+  ],
+  depends: [
+    helpers,
+    main,
   ],
 )

@@ -1,3 +1,4 @@
+import * as Formats from "./formats.mjs"
 import { default as HelpersModule } from "./helpers.mjs"
 
 export async function main(GM, unsafeWindow) {
@@ -130,28 +131,16 @@ export async function main(GM, unsafeWindow) {
   }
 
   async function get_decoder(buffer) {
-    let format;
-    // GIF: GIF87a or GIF89a.
-    if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 &&
-        buffer[3] === 0x38 && (buffer[4] === 0x37 || buffer[4] == 0x39) &&
-        buffer[5] === 0x61) {
-      format = 'GIF';
-    }
-    // WebP: RIFT....WEBP
-    else if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 &&
-             buffer[3] === 0x46 && buffer[8] === 0x57 && buffer[9] === 0x45 &&
-             buffer[10] === 0x42 && buffer[11] === 0x50) {
-      format = 'WebP';
-    }
-    else {
+    const format = Formats.probe_buffer_format(buffer);
+    if (format === null) {
       return null;
     }
     if (!Helpers) {
       Helpers = await HelpersModule();
       Helpers.image_readers = {};
-      for (const supported_format of ['GIF', 'WebP']) {
-        const name = supported_format.toLowerCase();
-        const handler = {format: supported_format}
+      for (const name of Formats.supported_formats) {
+        const id = name.toLowerCase();
+        const handler = {format: name}
         for (const method of `
              create destroy
              canvas_width canvas_height
@@ -159,9 +148,9 @@ export async function main(GM, unsafeWindow) {
              rewind decode_next_frame
              frame_index frame_duration frame_rgba
         `.split(/\s+/)) {
-          handler[method] = Helpers[`_${name}_reader_${method}`];
+          handler[method] = Helpers[`_${id}_reader_${method}`];
         }
-        Helpers.image_readers[supported_format] = handler;
+        Helpers.image_readers[name] = handler;
       }
     }
     const handler = Helpers.image_readers[format];
@@ -641,9 +630,7 @@ export async function main(GM, unsafeWindow) {
 
   async function process_image(img, src) {
     const url = new URL(src);
-    if (!settings.process_all_images && (
-      url.protocol === 'data:' && !url.pathname.startsWith('image/webp;') && !url.pathname.starswith('image/gif;') ||
-      !url.pathname.endsWith('.gif') && !url.pathname.endsWith('.gifv') && !url.pathname.endsWith('.webp'))) {
+    if (!settings.process_all_images && Formats.probe_url_format(url) === null) {
       return;
     }
     log('process', src, img);

@@ -1,5 +1,5 @@
 .DEFAULT: all
-.PHONY: all clean dist-clean fetch-thirdparty helpers lint re setup script test
+.PHONY: all clean dist-clean fetch-thirdparty helpers lint re setup serve script
 
 BUILD_DIR  ?= build
 BUILD_INFO := $(BUILD_DIR)/meson-info/intro-buildoptions.json
@@ -41,11 +41,8 @@ setup: $(BUILD_INFO)
 $(BUILD_INFO):
 	$(MESON_WITH_ENV) setup --cross-file=/dev/null -Dgif='$(GIF)' -Dwebp='$(WEBP)' -Dwasm='$(WASM)' $(BUILD_DIR)
 
-lint helpers script: $(BUILD_INFO)
+helpers lint script serve: $(BUILD_INFO)
 	$(MESON_WITH_ENV) compile -C $(BUILD_DIR) -v $@
-
-test: helpers
-	miniserve --index=test.html test
 
 $(USER_MK): Makefile
 	printf '%s\n' \
