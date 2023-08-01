@@ -259,25 +259,25 @@ export async function main(GM, unsafeWindow) {
       log('player.setup', this.id);
       GM.addStyle(`
         /* Hide image while playing. */
-        .gifanimate_image.gifanimate_playing {
+        .animage_image.animage_playing {
           opacity: 0 !important;
         }
 
         /* Prevent image CSS transitions from making a mess. */
-        .gifanimate_image {
+        .animage_image {
           transition: none !important;
           animation: none !important;
         }
         `);
       document.body.insertAdjacentHTML('beforeend', `
-        <div id="gifanimate_${this.id}">
+        <div id="animage_${this.id}">
         </div>
         `);
-      this.body = document.querySelector(`#gifanimate_${this.id}`);
+      this.body = document.querySelector(`#animage_${this.id}`);
       const shadow = this.body.attachShadow({mode: 'closed'});
       shadow.innerHTML = `
         <style>
-          :host(#gifanimate_${this.id}) {
+          :host(#animage_${this.id}) {
             background-color: rgba(0, 0, 0, 0) !important;
             position: absolute;
             pointer-events: none;
@@ -288,11 +288,11 @@ export async function main(GM, unsafeWindow) {
             justify-content: center;
           }
 
-          :host(.gifanimate_enabled) {
+          :host(.animage_enabled) {
             display: flex !important;
           }
 
-          :host(:not(.gifanimate_enabled)) {
+          :host(:not(.animage_enabled)) {
             display: none;
           }
 
@@ -352,7 +352,7 @@ export async function main(GM, unsafeWindow) {
             background-size: 100%;
           }
 
-          :host(.gifanimate_playing) .icon {
+          :host(.animage_playing) .icon {
             background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'><path fill='white' stroke='white' stroke-width='1.5' stroke-linejoin='round' d='M 3,3 H 13 V 13 H 3 Z'/></svg>");
           }
         </style>
@@ -419,7 +419,7 @@ export async function main(GM, unsafeWindow) {
             return;
           }
         }
-        this.img.classList.add('gifanimate_playing');
+        this.img.classList.add('animage_playing');
         this.canvas.classList.add('drawn');
         this.prepareNextFrame();
         const now = performance.now();
@@ -448,7 +448,7 @@ export async function main(GM, unsafeWindow) {
       }
       this.loops = this.decoder.loopCount;
       this.next_timestamp = 0;
-      this.body.classList.add('gifanimate_playing');
+      this.body.classList.add('animage_playing');
       this.control.classList.add('activated');
       this.decoder.rewind();
       await this.prepareNextFrame();
@@ -470,8 +470,8 @@ export async function main(GM, unsafeWindow) {
         unsafeWindow.cancelAnimationFrame(this.animation);
         this.animation = 0;
       }
-      this.img.classList.remove('gifanimate_playing');
-      this.body.classList.remove('gifanimate_playing');
+      this.img.classList.remove('animage_playing');
+      this.body.classList.remove('animage_playing');
       this.control.classList.remove('activated');
       this.canvas.classList.remove('drawn');
       this.timing_stats = null;
@@ -544,7 +544,7 @@ export async function main(GM, unsafeWindow) {
         this.body.style.left = `${window.pageXOffset + viewport.left}px`;
         this.body.style.top = `${window.pageYOffset + viewport.top}px`;
       }
-      this.body.classList.remove('gifanimate_playing');
+      this.body.classList.remove('animage_playing');
       this.img = img;
       this.src = src;
       this.decoder = decoder;
@@ -561,21 +561,21 @@ export async function main(GM, unsafeWindow) {
       img.addEventListener('mouseenter', this.on_image_mouseenter);
       img.addEventListener('mouseleave', this.on_image_mouseleave);
       img.addEventListener('mousemove', this.on_image_mousemove);
-      img.classList.add('gifanimate_image');
+      img.classList.add('animage_image');
       img.parentElement.appendChild(this.body);
-      this.body.classList.add('gifanimate_enabled');
+      this.body.classList.add('animage_enabled');
       this.control.classList.add('shown');
     }
 
     disable() {
-      if (!this.body.classList.contains('gifanimate_enabled')) {
+      if (!this.body.classList.contains('animage_enabled')) {
         return;
       }
       this.hide_control();
       this.stop();
       log('player.disable', this.id);
-      this.body.classList.remove('gifanimate_enabled');
-      this.img.classList.remove('gifanimate_image');
+      this.body.classList.remove('animage_enabled');
+      this.img.classList.remove('animage_image');
       this.img.removeEventListener('mouseenter', this.on_image_mouseenter);
       this.img.removeEventListener('mouseleave', this.on_image_mouseleave);
       this.img.removeEventListener('mousemove', this.on_image_mousemove);
