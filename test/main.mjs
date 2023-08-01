@@ -1,1 +1,1 @@
-../main.mjs
+../build/main.mjs
