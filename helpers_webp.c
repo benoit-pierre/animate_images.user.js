@@ -122,7 +122,7 @@ void webp_reader_decode_next_frame(webp_reader_t *reader)
 {
     reader->prev_frame_timestamp = reader->frame_timestamp;
     assert(-1 <= reader->frame_index && reader->frame_index < (int)reader->anim_info.frame_count);
-    if (++reader->frame_index == reader->anim_info.frame_count)
+    if (++reader->frame_index == (int)reader->anim_info.frame_count)
     {
         webp_reader_rewind(reader);
         reader->frame_index = 0;
