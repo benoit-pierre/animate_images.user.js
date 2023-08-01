@@ -8,6 +8,7 @@ project(
     'buildtype=minsize',
     'debug=false',
     'default_library=static',
+    'warning_level=2',
     'wrap_mode=forcefallback',
   ],
 )
