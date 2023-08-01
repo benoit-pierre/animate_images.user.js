@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animate Images
 // @description  Combine with `image.animation_mode=none` to play animated image formats (GIF & WebP) on click.
-// @version      1.0.0
+// @version      1.0.1
 // @downloadURL  https://github.com/benoit-pierre/animate_images.user.js/releases/latest/download/animate_images.user.js
 // @match        <all_urls>
 // @grant        GM.addStyle
