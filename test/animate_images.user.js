@@ -1,1 +1,0 @@
-../build/animate_images.user.js
