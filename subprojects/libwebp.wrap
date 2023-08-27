@@ -1,11 +1,15 @@
-[wrap-git]
-url = https://github.com/webmproject/libwebp.git
-# v1.3.1
-revision = fd7bb21c0cb56e8a82e9bfa376164b842f433f3b
-depth = 1
-patch_directory = libwebp/overlay
+[wrap-file]
+directory = libwebp-1.3.1
+source_url = https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.3.1.tar.gz
+source_filename = libwebp-1.3.1.tar.gz
+source_hash = b3779627c2dfd31e3d8c4485962c2efe17785ef975e2be5c8c0c9e6cd3c4ef66
+patch_filename = libwebp_1.3.1-2_patch.zip
+patch_url = https://wrapdb.mesonbuild.com/v2/libwebp_1.3.1-2/get_patch
+patch_hash = c1f8ff561ed6e0fb716fe6b6e05dd4dd726527e1058b0ba1e539a241d7c0dae0
+source_fallback_url = https://github.com/mesonbuild/wrapdb/releases/download/libwebp_1.3.1-2/libwebp-1.3.1.tar.gz
+wrapdb_version = 1.3.1-2
 diff_files = 
-	libwebp/fix-WEBP_REDUCE_SIZE-support.patch
+	libwebp/expand-WEBP_REDUCE_SIZE-support.patch
 
 [provide]
-dependency_names = libwebp, libwebpdemux
+dependency_names = libsharyuv, libwebp, libwebpdecoder, libwebpdemux, libwebpmux

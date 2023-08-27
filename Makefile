@@ -36,6 +36,14 @@ webp = $(or $(WEBP),true)
 # Output options.
 wasm = $(or $(WASM),true)
 
+[libwebp:project options]
+disable-stats = true
+libwebpdecoder = 'enabled'
+libwebpdemux = 'enabled'
+near-lossless = false
+reduce-csp = true
+reduce-size = true
+
 # vim: ft=cfg
 endef
 
