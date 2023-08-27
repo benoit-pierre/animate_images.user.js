@@ -155,3 +155,20 @@ run_target(
     main,
   ],
 )
+
+summary(
+  {
+    'GIF': get_option('gif'),
+    'WebP': get_option('webp'),
+  },
+  bool_yn: true,
+  section: 'Image formats',
+)
+
+summary(
+  {
+    'WebAssembly': get_option('wasm'),
+  },
+  bool_yn: true,
+  section: 'Output options',
+)

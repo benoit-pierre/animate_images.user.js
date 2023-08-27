@@ -1,4 +1,4 @@
 /build/
 /build-*/
-/user.mk
-/user-*.mk
+/config.ini
+/config-*.ini

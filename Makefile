@@ -1,10 +1,14 @@
+.ONESHELL:
+SHELL = bash
+.SHELLFLAGS = -eo pipefail -c
+
 .DEFAULT: all
-.PHONY: all clean dist-clean fetch-thirdparty helpers lint re setup serve script
+.PHONY: all clean config dist-clean fetch-thirdparty helpers lint re setup serve script
 
 BUILD_DIR  ?= build
 BUILD_INFO := $(BUILD_DIR)/meson-info/intro-buildoptions.json
 
-USER_MK ?= user.mk
+CONFIG ?= config.ini
 
 define which
 $(eval p:=$(and $1,$(shell which $(firstword $1))))$(and $p,$p $(wordlist 2,$(words $1),$1))
@@ -19,16 +23,39 @@ $(strip $(or $(call $1),\
 	$(error Program '$2' not found or not executable)))
 endef
 
+define config
+[binaries]
+ar    = '$(call find_program,EMAR,emar)'
+c     = ['$(call find_program,CCACHE,ccache,sccache,env)', '$(call find_program,EMCC,emcc)']
+strip = '$(call find_program,EMSTRIP,emstrip)'
+
+[project options]
+# Image formats.
+gif  = $(or $(GIF),true)
+webp = $(or $(WEBP),true)
+# Output options.
+wasm = $(or $(WASM),true)
+
+# vim: ft=cfg
+endef
+
+define newline
+
+
+endef
+
 # Programs.
-MESON_WITH_ENV = env AR='$(EMAR)' CC='$(strip $(CCACHE) $(EMCC))' STRIP='$(EMSTRIP)' $(MESON)
+MESON ?= meson
 
 all: script
 
 clean:
 	rm --force --recursive $(BUILD_DIR)
 
+config: $(CONFIG)
+
 dist-clean:
-	-rm --force --recursive $(wildcard user.mk user-*.mk build/ build-*/ $(patsubst %.wrap,%/,$(wildcard subprojects/*.wrap)))
+	-rm --force --recursive $(wildcard config.ini config-*.ini build/ build-*/ $(patsubst %.wrap,%*/,$(wildcard subprojects/*.wrap)))
 
 fetch-thirdparty:
 	$(MESON) subprojects download --num-processes 3
@@ -38,43 +65,20 @@ re: clean
 
 setup: $(BUILD_INFO)
 
-$(BUILD_INFO):
-	$(MESON_WITH_ENV) setup --cross-file=/dev/null -Dgif='$(GIF)' -Dwebp='$(WEBP)' -Dwasm='$(WASM)' $(BUILD_DIR)
+$(BUILD_INFO): $(CONFIG)
+	$(strip $(MESON) setup --auto-features=disabled --cross-file=$(CONFIG) $(if $(wildcard $(BUILD_INFO)),--wipe) $(BUILD_DIR))
 
 helpers lint script serve: $(BUILD_INFO)
-	$(MESON_WITH_ENV) compile -C $(BUILD_DIR) -v $@
+	$(MESON) compile -C $(BUILD_DIR) -v $@
 
-$(USER_MK): Makefile
-	printf '%s\n' \
-		'# Programs.' \
-		'CCACHE  ?= $(call find_program,CCACHE,ccache,sccache,env)' \
-		'EMAR    ?= $(call find_program,EMAR,emar)' \
-		'EMCC    ?= $(call find_program,EMCC,emcc)' \
-		'EMSTRIP ?= $(call find_program,EMSTRIP,emstrip)' \
-		'MESON   ?= $(call find_program,MESON,meson)' \
-		'# Image formats.' \
-		'GIF  ?= $(or $(GIF),true)' \
-		'WEBP ?= $(or $(WEBP),true)' \
-		'# Output options.' \
-		'WASM ?= $(or $(WASM),true)' \
-		>$@
-
-ifeq (,$(filter clean %-clean %-build,$(MAKECMDGOALS)))
-include $(USER_MK)
-endif
+$(CONFIG): Makefile
+	cat >$@ <<'EOF'
+	$(config)
+	EOF
 
 # Containers support.
 
-.PHONY: container-build docker-build docker-clean podman-build podman-clean
-
-define container_run
-$(strip $(call find_program,$1,$2) run --mount type=bind,source='$(CURDIR),target=/src' \
-	--interactive --rm --tty $3 '$4emscripten/emsdk$(EMSDK_VERSION:%=:%)' \
-	env MAKEFLAGS='$(filter-out --jobserver-%,$(MAKEFLAGS))' \
-	make BUILD_DIR='$($1_BUILD)' USER_MK='$($1_USER_MK)' \
-	-C /src container-build \
-	)
-endef
+.PHONY: container-build container-config
 
 container-build:
 	npm config set prefix='~/.local/' update-notifier=false
@@ -82,20 +86,26 @@ container-build:
 	python3 -m pip install --no-warn-script-location --user 'meson$(MESON_VERSION:%===%)' 'ninja$(NINJA_VERSION:%===%)'
 	env PATH="$$HOME/.local/bin:$$PATH" $(MAKE) all
 
-DOCKER_BUILD   ?= build-docker
-DOCKER_USER_MK ?= user-docker.mk
+container-config: config
 
-docker-build:
-	$(call container_run,DOCKER,docker,--user "$$UID:$$GID",)
+define container_rules
+$1        ?= $2
+$1_BUILD  ?= build-$2
+$1_CONFIG ?= config-$2.ini
+.PHONY: $(patsubst %,$2-%,build clean config)
+$2-build $2-config:
+	$$(strip $$(call find_program,$1,$2) run --mount type=bind,source='$$(CURDIR),target=/src' \
+		--interactive --rm --tty $3 '$4emscripten/emsdk$$(EMSDK_VERSION:%=:%)' \
+		env MAKEFLAGS='$$(filter-out --jobserver-%,$$(MAKEFLAGS))' \
+		make BUILD_DIR='$$($1_BUILD)' CONFIG='$$($1_CONFIG)' \
+		-C /src $$(@:$2-%=container-%) \
+	)
+$2-clean:
+	rm --force --recursive '$$($1_BUILD)' '$$($1_CONFIG)'
+endef
 
-docker-clean:
-	rm --force --recursive '$(DOCKER_BUILD)' '$(DOCKER_USER_MK)'
+# For completion.
+docker-build docker-config docker-clean podman-config podman-build podman-clean:
 
-PODMAN_BUILD   ?= build-podman
-PODMAN_USER_MK ?= user-podman.mk
-
-podman-build:
-	$(call container_run,PODMAN,podman,,docker.io/)
-
-podman-clean:
-	rm --force --recursive '$(PODMAN_BUILD)' '$(PODMAN_USER_MK)'
+$(eval $(call container_rules,DOCKER,docker,--user "$$$$UID:$$$$GID",))
+$(eval $(call container_rules,PODMAN,podman,,docker.io/))
