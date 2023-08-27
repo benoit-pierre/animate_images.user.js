@@ -25,9 +25,10 @@ endef
 
 define config
 [binaries]
-ar    = '$(call find_program,EMAR,emar)'
-c     = ['$(call find_program,CCACHE,ccache,sccache,env)', '$(call find_program,EMCC,emcc)']
-strip = '$(call find_program,EMSTRIP,emstrip)'
+ar     = '$(call find_program,EMAR,emar)'
+c      = ['$(call find_program,CCACHE,ccache,sccache,env)', '$(call find_program,EMCC,emcc)']
+ranlib = '$(call find_program,EMRANLIB,emranlib)'
+strip  = '$(call find_program,EMSTRIP,emstrip)'
 
 [project options]
 # Image formats.
