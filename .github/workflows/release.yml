@@ -21,7 +21,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          depth: 1
+          clean: false
+          fetch-depth: 1
+          show-progress: false
 
       - name: Build
         run: make podman-build
