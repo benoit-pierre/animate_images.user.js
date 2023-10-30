@@ -1,7 +1,7 @@
 project(
   'animate_images.user.js',
   'c',
-  version: '0.1',
+  version: '1.0.2',
   meson_version: '>=0.64',
   default_options: [
     'b_lto=true',
@@ -68,28 +68,39 @@ ldflags += {
 add_global_arguments(cflags, language: 'c')
 add_global_link_arguments(cflags + ldflags, language: 'c')
 
+formats_list = []
 formats_support = {}
 
 helpers_deps = []
 helpers_srcs = []
 
 foreach _spec : [
-  ['gif', 'libnsgif', 'libnsgif'],
-  ['webp', 'libwebp', 'libwebpdemux'],
+  ['GIF', 'libnsgif', 'libnsgif'],
+  ['WebP', 'libwebp', 'libwebpdemux'],
 ]
-  _fmt = _spec[0]
+  _name = _spec[0]
   _prj = _spec[1]
   _dep = _spec[2]
+  _fmt = _name.to_lower()
   _supported = get_option(_fmt)
   if _supported
     subproject(_prj)
     helpers_deps += dependency(_dep)
     helpers_srcs += 'helpers_@0@.c'.format(_fmt)
   endif
+  formats_list += _supported ? [_name] : []
   formats_support += {'@0@_SUPPORT'.format(_fmt.to_upper()): _supported.to_string()}
 endforeach
 
 entrypoint = fs.copyfile('entrypoint.mjs')
+
+meta = fs.read('script.meta')
+foreach _k, _v : {
+  'formats': ' & '.join(formats_list),
+  'version': meson.project_version(),
+}
+  meta = meta.replace('${' + _k + '}', _v)
+endforeach
 
 formats = configure_file(
   configuration: formats_support,
@@ -111,7 +122,7 @@ script = custom_target(
   build_by_default: true,
   command: [
     find_program('esbuild'),
-    '--banner:js=' + fs.read('script.meta'),
+    '--banner:js=' + meta,
     '--outfile=@OUTPUT@',
     '--bundle',
     '--minify',
