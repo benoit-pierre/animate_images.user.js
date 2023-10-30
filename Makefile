@@ -87,13 +87,18 @@ $(CONFIG): Makefile
 
 # Containers support.
 
+EMSDK_VERSION ?= 3.1.47@sha256:766c74500cac2e1060ca0590d9b4352db2de72651a6afb8049f6288820e1dc2a
+
 .PHONY: container-build container-config
 
 container-build:
+	mkdir -p $(BUILD_ROOT)
+	cp package.json package-lock.json $(BUILD_ROOT)/
 	npm config set prefix='~/.local/' update-notifier=false
-	npm install --global --no-audit 'esbuild$(ESBUILD_VERSION:%=@%)'
-	python3 -m pip install --no-warn-script-location --user 'meson$(MESON_VERSION:%===%)' 'ninja$(NINJA_VERSION:%===%)'
-	env PATH="$$HOME/.local/bin:$$PATH" $(MAKE) all
+	npm ci --prefix $(BUILD_ROOT) --no-audit
+	python3 -m venv $(BUILD_ROOT)/venv --system-site-packages --without-pip
+	$(abspath $(BUILD_ROOT)/venv/bin/python) -m pip install --no-warn-script-location --requirement requirements.txt
+	env PATH="$(abspath $(BUILD_ROOT)/node_modules/esbuild/bin):$(abspath $(BUILD_ROOT)/venv/bin):$$PATH" $(MAKE) all
 
 container-config: config
 
@@ -106,7 +111,7 @@ $2-build $2-config:
 	$$(strip $$(call find_program,$1,$2) run --mount type=bind,source='$$(CURDIR),target=/src' \
 		--interactive --rm --tty $3 '$4emscripten/emsdk$$(EMSDK_VERSION:%=:%)' \
 		env MAKEFLAGS='$$(filter-out --jobserver-%,$$(MAKEFLAGS))' \
-		make BUILD_DIR='$$($1_BUILD)' CONFIG='$$($1_CONFIG)' \
+		make BUILD_ROOT='$$($1_BUILD)' BUILD_DIR='$$($1_BUILD)/build' CONFIG='$$($1_CONFIG)' \
 		-C /src $$(@:$2-%=container-%) \
 	)
 $2-clean:
