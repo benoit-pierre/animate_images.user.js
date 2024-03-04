@@ -38,7 +38,6 @@ ldflags = '''
 -s MODULARIZE=1
 -s SINGLE_FILE=1
 -s STACK_SIZE=8kb
--s SUPPORT_ERRNO=0
 -s SUPPORT_LONGJMP=0
 -s USE_ES6_IMPORT_META=0
 '''.split()
