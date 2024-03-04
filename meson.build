@@ -17,7 +17,6 @@ fs = import('fs')
 
 cflags = '''
 -fno-exceptions
--s DEFAULT_TO_CXX=0
 -s STRICT=1
 '''.split()
 
