@@ -87,7 +87,7 @@ $(CONFIG): Makefile
 
 # Containers support.
 
-EMSDK_VERSION ?= 3.1.54@sha256:b38256e36b5afe4c9ec65857c53fc9f9696d1284bdddae36ae7768ebee8c4ecd
+EMSDK_VERSION ?= 3.1.55@sha256:0d9172d4b153a9a1067db4c753f8ec1bcb1542bfe1ca61a3c2d9115080b1963f
 
 .PHONY: container-build container-config
 
