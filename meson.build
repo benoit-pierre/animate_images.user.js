@@ -1,7 +1,7 @@
 project(
   'animate_images.user.js',
   'c',
-  version: '1.0.4',
+  version: '1.0.5',
   meson_version: '>=0.64',
   default_options: [
     'b_lto=true',
