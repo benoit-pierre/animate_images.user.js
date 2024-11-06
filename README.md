@@ -4,7 +4,7 @@ A Firefox [userscript](https://en.wikipedia.org/wiki/Userscript): combine with [
 
 Supported userscript managers:
 
-- [FireMonkey](https://addons.mozilla.org/en-US/firefox/addon/firemonkey) (as of `2.72`): partially broken when using `privacy.firstparty.isolate=true` and containers.
+- [FireMonkey](https://addons.mozilla.org/en-US/firefox/addon/firemonkey) (as of `2.72`): yes.
 
 - [GreaseMonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey) (as of `4.13`): broken when using `privacy.firstparty.isolate=true`.
 

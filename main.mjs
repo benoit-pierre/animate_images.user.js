@@ -57,6 +57,7 @@ export async function main(GM, unsafeWindow) {
     typeof GM.fetch === "function"
     // FireMonkey.
     ? href => GM.fetch(href, {
+      anonymous: true,
       method: 'GET',
       cache: 'force-cache',
       responseType: 'arrayBuffer',
@@ -64,6 +65,7 @@ export async function main(GM, unsafeWindow) {
     // Other script managers.
     : href => new Promise((resolve, reject) => {
       GM.xmlHttpRequest({
+        anonymous: true,
         url: href,
         method: 'GET',
         responseType: 'arraybuffer',
