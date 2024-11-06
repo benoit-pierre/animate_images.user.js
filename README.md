@@ -4,13 +4,13 @@ A Firefox [userscript](https://en.wikipedia.org/wiki/Userscript): combine with [
 
 Supported userscript managers:
 
-- [FireMonkey](https://addons.mozilla.org/en-US/firefox/addon/firemonkey): partially broken when using `privacy.firstparty.isolate=true`.
+- [FireMonkey](https://addons.mozilla.org/en-US/firefox/addon/firemonkey) (as of `2.72`): partially broken when using `privacy.firstparty.isolate=true` and containers.
 
-- [GreaseMonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey): broken when using `privacy.firstparty.isolate=true`.
+- [GreaseMonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey) (as of `4.13`): broken when using `privacy.firstparty.isolate=true`.
 
-- [Tampermonkey](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey): 
+- [Tampermonkey](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey) (as of `5.3.1`):
   * Does not work on pages where JavaScript is disabled (e.g. with uBlock Origin).
   * Does not support `@match <all_urls>` in metadata block: you'll have to add a `*` entry to the "User includes" rules.
   * You'll also want to add a `*` entry to the "User domain whitelist" rules unless you fancy manually whitelisting every request to fetch an image.
 
-- [Violentmonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/): yes.
+- [Violentmonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/) (as of `2.28.0`): yes.
