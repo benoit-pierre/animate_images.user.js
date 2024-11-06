@@ -3,7 +3,7 @@ SHELL = bash
 .SHELLFLAGS = -eo pipefail -c
 
 .DEFAULT: all
-.PHONY: all clean config dist-clean fetch-thirdparty helpers lint re setup serve script
+.PHONY: all bump-% clean config dist-clean fetch-thirdparty helpers lint re setup serve script
 
 BUILD_DIR  ?= build
 BUILD_INFO := $(BUILD_DIR)/meson-info/intro-buildoptions.json
@@ -84,6 +84,41 @@ $(CONFIG): Makefile
 	cat >$@ <<'EOF'
 	$(config)
 	EOF
+
+# Helpers for bumping requirements.
+
+CURL = curl --location --silent
+
+bump-emsdk:
+	@image="$$(
+	  $(CURL) 'https://registry.hub.docker.com/v2/repositories/emscripten/emsdk/tags' |
+	  jq -r '
+	    (.results[] | select(.name == "latest").digest) as $$digest |
+	    .results[] | select(.digest == $$digest) | select(.name != "latest") |
+	    .name + "@" + $$digest
+	  '
+	)"
+	echo "bump emsdk to $${image%%@*}"
+	sed -i -e "s/^EMSDK_VERSION ?= .*/EMSDK_VERSION ?= $$image/" Makefile
+
+bump-esbuild:
+	@package='$(@:bump-%=%)'
+	version="$$({ npm outdated --json || true; } | jq -r ".$$package.latest")"
+	echo "bump esbuild to $$version"
+	npm install --package-lock-only --save-exact "$$package@$$version"
+
+bump-meson bump-ninja:
+	@package='$(@:bump-%=%)'
+	version="$$(
+	  $(CURL) "https://pypi.python.org/pypi/$$package/json" |
+	  jq -r '.info.version'
+	)"
+	hashes="$$(
+	  $(CURL) "https://pypi.python.org/pypi/$$package/$$version/json" |
+	  jq -j '.urls | sort[].digests.sha256 | " --hash=sha256:" + .'
+	)"
+	echo "bump $$package to $$version"
+	sed -i -e "s/^$$package==.*/$$package==$$version$$hashes/" requirements.txt
 
 # Containers support.
 
