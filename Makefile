@@ -122,7 +122,7 @@ bump-meson bump-ninja:
 
 # Containers support.
 
-EMSDK_VERSION ?= 3.1.71@sha256:9922c93314b63a1d9ceba2e76f03737f1f9cc4b7350341211e2d3555633ffdd5
+EMSDK_VERSION ?= 3.1.74@sha256:af45409f3199d88db4b1b03af0098532c8fb33a375ac257463eeb0a622870d06
 
 .PHONY: container-build container-config
 
