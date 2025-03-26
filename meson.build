@@ -157,8 +157,9 @@ run_target(
 run_target(
   'serve',
   command: [
-    find_program('miniserve', disabler: true, required: false),
-    '--index=test.html', meson.project_source_root() / 'test',
+    find_program('darkhttpd', disabler: true, required: false),
+    meson.project_source_root() / 'test',
+    '--index', 'test.html',
   ],
   depends: [
     helpers,
