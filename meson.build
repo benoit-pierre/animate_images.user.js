@@ -40,7 +40,6 @@ ldflags = '''
 -s SINGLE_FILE=1
 -s STACK_SIZE=8kb
 -s SUPPORT_LONGJMP=0
--s USE_ES6_IMPORT_META=0
 '''.split()
 
 if get_option('wasm')
