@@ -159,6 +159,7 @@ run_target(
     find_program('darkhttpd', disabler: true, required: false),
     meson.project_source_root() / 'test',
     '--index', 'test.html',
+    '--mimetypes',  meson.project_source_root() /  'test/mimetypes',
   ],
   depends: [
     helpers,
