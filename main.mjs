@@ -688,7 +688,7 @@ export async function main(GM, unsafeWindow) {
     }
   }
 
-  document.body.onmouseover = on_mouse_over;
+  document.body.addEventListener('mouseover', on_mouse_over);
 }
 
 // vim: expandtab sw=2
