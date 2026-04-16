@@ -156,5 +156,5 @@ endef
 # For completion.
 docker-build docker-config docker-clean podman-config podman-build podman-clean:
 
-$(eval $(call container_rules,DOCKER,docker,--user "$$$$UID:$$$$GID",))
+$(eval $(call container_rules,DOCKER,docker,--user root,))
 $(eval $(call container_rules,PODMAN,podman,,docker.io/))
