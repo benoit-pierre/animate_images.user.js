@@ -78,7 +78,7 @@ $(BUILD_INFO): $(CONFIG)
 	$(strip $(MESON) setup --auto-features=disabled --cross-file=$(CONFIG) $(if $(wildcard $(BUILD_INFO)),--wipe) $(BUILD_DIR))
 
 helpers lint script serve: $(BUILD_INFO)
-	$(MESON) compile -C $(BUILD_DIR) -v $@
+	$(MESON) compile --ninja-args=--quiet -C $(BUILD_DIR) $@
 
 $(CONFIG): Makefile
 	cat >$@ <<'EOF'
