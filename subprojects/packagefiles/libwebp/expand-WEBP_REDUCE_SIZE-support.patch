@@ -1,7 +1,8 @@
-diff --git i/src/dec/vp8l_dec.c w/src/dec/vp8l_dec.c
---- i/src/dec/vp8l_dec.c
-+++ w/src/dec/vp8l_dec.c
-@@ -665,6 +665,8 @@ static void ConvertToYUVA(const uint32_t* const src, int width, int y_pos,
+diff --git a/src/dec/vp8l_dec.c b/src/dec/vp8l_dec.c
+index cf8cd82c..7471d752 100644
+--- a/src/dec/vp8l_dec.c
++++ b/src/dec/vp8l_dec.c
+@@ -696,6 +696,8 @@ static void ConvertToYUVA(const uint32_t* const src, int width, int y_pos,
    }
  }
  
@@ -10,7 +11,7 @@ diff --git i/src/dec/vp8l_dec.c w/src/dec/vp8l_dec.c
  static int ExportYUVA(const VP8LDecoder* const dec, int y_pos) {
    WebPRescaler* const rescaler = dec->rescaler;
    uint32_t* const src = (uint32_t*)rescaler->dst;
-@@ -699,6 +701,8 @@ static int EmitRescaledRowsYUVA(const VP8LDecoder* const dec,
+@@ -730,6 +732,8 @@ static int EmitRescaledRowsYUVA(const VP8LDecoder* const dec,
    return y_pos;
  }
  
@@ -19,23 +20,24 @@ diff --git i/src/dec/vp8l_dec.c w/src/dec/vp8l_dec.c
  static int EmitRowsYUVA(const VP8LDecoder* const dec,
                          const uint8_t* in, int in_stride,
                          int mb_w, int num_rows) {
-@@ -817,8 +821,11 @@ static void ProcessRows(VP8LDecoder* const dec, int row) {
-         // Update 'last_out_row_'.
-         dec->last_out_row_ += num_rows_out;
+@@ -848,8 +852,11 @@ static void ProcessRows(VP8LDecoder* const dec, int row) {
+         // Update 'last_out_row'.
+         dec->last_out_row += num_rows_out;
        } else {                              // convert to YUVA
--        dec->last_out_row_ = io->use_scaling ?
-+        dec->last_out_row_ =
+-        dec->last_out_row = io->use_scaling ?
++        dec->last_out_row =
 +#if !defined(WEBP_REDUCE_SIZE)
 +         io->use_scaling ?
              EmitRescaledRowsYUVA(dec, rows_data, in_stride, io->mb_h) :
 +#endif  // WEBP_REDUCE_SIZE
              EmitRowsYUVA(dec, rows_data, in_stride, io->mb_w, io->mb_h);
        }
-       assert(dec->last_out_row_ <= output->height);
-diff --git i/src/dec/webp_dec.c w/src/dec/webp_dec.c
---- i/src/dec/webp_dec.c
-+++ w/src/dec/webp_dec.c
-@@ -830,6 +830,7 @@ int WebPIoInitFromOptions(const WebPDecoderOptions* const options,
+       assert(dec->last_out_row <= output->height);
+diff --git a/src/dec/webp_dec.c b/src/dec/webp_dec.c
+index 5e7c23fe..dc0686e6 100644
+--- a/src/dec/webp_dec.c
++++ b/src/dec/webp_dec.c
+@@ -902,6 +902,7 @@ int WebPIoInitFromOptions(const WebPDecoderOptions* const options,
    // Scaling
    io->use_scaling = (options != NULL) && options->use_scaling;
    if (io->use_scaling) {
@@ -43,7 +45,7 @@ diff --git i/src/dec/webp_dec.c w/src/dec/webp_dec.c
      int scaled_width = options->scaled_width;
      int scaled_height = options->scaled_height;
      if (!WebPRescalerGetScaledDimensions(w, h, &scaled_width, &scaled_height)) {
-@@ -837,6 +838,9 @@ int WebPIoInitFromOptions(const WebPDecoderOptions* const options,
+@@ -909,6 +910,9 @@ int WebPIoInitFromOptions(const WebPDecoderOptions* const options,
      }
      io->scaled_width = scaled_width;
      io->scaled_height = scaled_height;
