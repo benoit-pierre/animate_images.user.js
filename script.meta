@@ -5,11 +5,12 @@
 // @downloadURL  https://github.com/benoit-pierre/animate_images.user.js/releases/latest/download/animate_images.user.js
 // @match        <all_urls>
 // @grant        GM.addStyle
+// @grant        GM.addValueChangeListener
+// @grant        GM.fetch
 // @grant        GM.getValue
 // @grant        GM.notification
+// @grant        GM.registerMenuCommand
 // @grant        GM.setValue
 // @grant        GM.xmlHttpRequest
-// @grant        GM.addValueChangeListener
-// @grant        GM.registerMenuCommand
 // ==/UserScript==
 //
