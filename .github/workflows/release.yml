@@ -19,7 +19,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           clean: false
           fetch-depth: 1
@@ -29,21 +29,10 @@ jobs:
         run: make podman-build
 
       - name: Publish
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const tag = context.ref.replace('refs/tags/', '');
-            const release = await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: tag,
-            });
-            const asset = await github.rest.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: release.data.id,
-              name: 'animate_images.user.js',
-              data: await fs.readFileSync("build-podman/build/animate_images.user.js"),
-              label: 'User script (js)',
-            });
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create
+          --title '${{ github.ref_name }}'
+          --verify-tag '${{ github.ref_name }}'
+          'build-podman/build/animate_images.user.js#User script (js)'
