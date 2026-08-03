@@ -60,8 +60,7 @@ export async function main(GM, unsafeWindow) {
       anonymous: true,
       method: 'GET',
       cache: 'force-cache',
-      responseType: 'arrayBuffer',
-    }).then(r => copy_array(r.arrayBuffer))
+    }).then(r => r.arrayBuffer()).then(b => copy_array(b))
     // Other script managers.
     : href => new Promise((resolve, reject) => {
       GM.xmlHttpRequest({
