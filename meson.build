@@ -25,41 +25,30 @@ ldflags = '''
 --emit-symbol-map
 --no-entry
 -s ALLOW_MEMORY_GROWTH=1
--s ALLOW_UNIMPLEMENTED_SYSCALLS=0
 -s ASSERTIONS=0
--s ASYNCIFY=0
--s AUTO_JS_LIBRARIES=0
--s AUTO_NATIVE_LIBRARIES=0
--s DEFAULT_TO_CXX=0
 -s DYNAMIC_EXECUTION=0
 -s ENVIRONMENT=web
 -s EXPORTED_FUNCTIONS=_malloc,_free
 -s EXPORTED_RUNTIME_METHODS=HEAPU8
--s EXPORT_NAME=WebPModule
+-s EXPORT_KEEPALIVE=1
 -s FETCH_SUPPORT_INDEXEDDB=0
 -s FILESYSTEM=0
 -s HTML5_SUPPORT_DEFERRING_USER_SENSITIVE_REQUESTS=0
--s INITIAL_MEMORY=4MB
+-s INITIAL_HEAP=4MB
 -s MALLOC=emmalloc
 -s MINIFY_HTML=0
+-s MINIMAL_RUNTIME=1
 -s MODULARIZE=1
 -s POLYFILL=0
 -s SINGLE_FILE=1
+-s SINGLE_FILE_BINARY_ENCODE=0
 -s STACK_SIZE=8kb
 -s SUPPORT_LONGJMP=0
 -s TEXTDECODER=2
+-s WASM_LEGACY_EXCEPTIONS=0
 '''.split()
 
-if get_option('wasm')
-  ldflags += '''
-  -s WASM=1
-  -s WASM_BIGINT=1
-  '''.split()
-else
-  ldflags += '''
-  -s WASM=0
-  '''.split()
-endif
+ldflags += ['-s', 'WASM=' + get_option('wasm').to_int().to_string()]
 
 ldflags += {
   'plain': [],
