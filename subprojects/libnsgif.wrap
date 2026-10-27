@@ -1,7 +1,7 @@
 [wrap-git]
 url = https://github.com/netsurf-browser/libnsgif.git
-# release/1.0.0
-revision = e97bc7b86f19ace910a2c71025ad2d94a28a1d2e
+# 1.0.0-10-g9abf119
+revision = 9abf1190d71ab3ae150ae6b29cf14cf7a3594a70
 depth = 1
 patch_directory = libnsgif/overlay
 
